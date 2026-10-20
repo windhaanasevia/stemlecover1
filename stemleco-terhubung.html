@@ -1,0 +1,158 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>STEMLECO</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f1faf0;--card:#fff;--tx:#23402b;--g:#4caf50;--gd:#2e7d32;--br:#8d6e63;--sky:#81d4fa;--soft:#e3f4e1;--bad:#e57373}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#17261b;--card:#213528;--tx:#e9f5ea;--soft:#2b4533;--gd:#8bd48f}}
+:root[data-theme=dark]{--bg:#17261b;--card:#213528;--tx:#e9f5ea;--soft:#2b4533;--gd:#8bd48f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:18px/1.6 Nunito,sans-serif}
+h1,h2,h3{font-family:'Baloo 2',sans-serif;margin:.3em 0;line-height:1.2}
+header{display:flex;gap:8px;align-items:center;padding:12px 16px;background:var(--g);color:#fff;position:sticky;top:0;z-index:5;flex-wrap:wrap}
+header b{font:800 24px 'Baloo 2';flex:1}header button{background:#fff3;color:#fff;border:0;border-radius:14px;padding:6px 12px;font:700 16px Nunito;cursor:pointer}
+main{max-width:860px;margin:auto;padding:16px}
+.card{background:var(--card);border-radius:24px;padding:18px;margin:14px 0;box-shadow:0 4px 14px #0001}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.menu{font-size:44px;text-align:center;cursor:pointer;border:3px solid var(--soft);transition:.2s}.menu:hover{transform:translateY(-4px);border-color:var(--g)}.menu h3{font-size:19px}
+.btn{background:var(--g);color:#fff;border:0;border-radius:18px;padding:10px 20px;font:800 18px Nunito;cursor:pointer;margin:4px 4px 4px 0;transition:.15s}.btn:active{transform:scale(.94)}.btn.alt{background:var(--sky);color:#0d3b57}.btn:disabled{opacity:.4}
+.bar{height:14px;background:var(--soft);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--g);transition:width .5s}
+.info{background:var(--soft);border-left:6px solid var(--br);border-radius:14px;padding:10px 14px;margin:10px 0}
+.hero{background:linear-gradient(135deg,#c8e6c9,#b3e5fc);color:#1b3a22;text-align:center;font-size:60px}.hero h1{font-size:32px}
+textarea,input[type=text]{width:100%;font:inherit;padding:10px;border-radius:14px;border:2px solid var(--soft);background:var(--card);color:var(--tx)}
+.opt{display:block;width:100%;text-align:left;background:var(--soft);color:var(--tx);border:3px solid transparent;border-radius:16px;padding:10px 14px;margin:6px 0;font:700 17px Nunito;cursor:pointer}.opt.sel{border-color:var(--g)}.opt.ok{background:#c8e6c9;color:#14301a}.opt.no{background:#ffcdd2;color:#4a1414}
+.chip{display:inline-block;background:var(--soft);border-radius:14px;padding:6px 12px;margin:4px;cursor:pointer;font-weight:700}.chip.used{opacity:.3}
+table{border-collapse:collapse;width:100%}td,th{border:2px solid var(--soft);padding:6px;text-align:center}
+.tag{font-size:13px;background:var(--br);color:#fff;border-radius:9px;padding:1px 8px}
+#toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--gd);color:#fff;padding:10px 20px;border-radius:20px;display:none;z-index:9;max-width:90%}
+@keyframes pop{0%{transform:scale(.5)}100%{transform:scale(1)}}.pop{animation:pop .4s}
+</style></head><body>
+<header><b>🌿 STEMLECO</b><button onclick="go('home')">🏠 Beranda</button><button onclick="go('profil')">🧒 Profil</button></header>
+<main id="m"></main><div id="toast"></div>
+<script>
+// ===== KONFIGURASI: tempel URL Web App Google Apps Script di sini =====
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbzW1I42BA6ls4yPPWXaZ8g5PSDIgosh383k6DqRdGjck3irF2QQdMP0n-5CpygSGX7NRA/exec";
+const EMAIL="25010855077@mhs.unesa.ac.id";
+// ===== Penyimpanan =====
+let S={};try{S=JSON.parse(localStorage.getItem("stemleco")||"{}")}catch(e){}
+S.p=S.p||{};S.q=S.q||[];S.r=S.r||[];S.a=S.a||[];S.log=S.log||[];
+const save=()=>{try{localStorage.setItem("stemleco",JSON.stringify(S))}catch(e){}};
+const $=s=>document.getElementById(s);
+function toast(t){const e=$("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",3500)}
+async function kirim(jenis,data,skor){
+ const pay={waktu:new Date().toISOString(),siswa:S.name,kelas:S.kelas||"V",jenis,jawaban:JSON.stringify(data),skor:skor??"",email:EMAIL};
+ if(!SCRIPT_URL){toast("⚠️ Tersimpan di perangkat ini. Server belum dihubungkan.");return false}
+ try{const r=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(pay)});const j=await r.json();
+  if(j.ok){toast("✅ Terkirim ke server!");return true}throw 0}catch(e){toast("❌ Gagal terkirim ke server. Coba lagi.");return false}}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+// ===== Data proyek =====
+const P=[
+{id:"kipas",t:"Kipas Tanpa Listrik",e:"🌀",
+ masalah:"Saat listrik padam di siang hari, kelas Dina terasa sangat panas. Semua orang kegerahan, padahal kipas angin mati. Bagaimana cara membuat angin tanpa listrik?",
+ pantik:"Mengapa kita merasa sejuk saat mengipasi wajah dengan buku?",
+ konsep:["Angin adalah udara yang bergerak. Saat kamu menggerakkan kipas, kamu mendorong udara ke arah wajahmu. Udara yang bergerak membawa panas dari kulit dan membantu keringat menguap lebih cepat, sehingga kulit terasa dingin.","Kipas baling-baling berputar karena tenaga dorongan tanganmu atau tiupan angin. Semakin besar dan miring baling-baling, semakin banyak udara yang terdorong. Namun baling-baling yang terlalu berat sulit berputar, jadi kita memilih bahan ringan.","Lingkungan: kipas tanpa listrik menghemat energi. Listrik di banyak tempat berasal dari bahan bakar fosil yang menghasilkan asap. Dengan memakai tenaga tangan, kita ikut mengurangi polusi."],
+ fakta:"Keringat yang menguap membawa panas tubuh pergi. Itulah mengapa angin membuat kita sejuk!",
+ alat:[["🥤","Botol plastik bekas","1"],["✂️","Gunting (dengan bantuan guru)","1"],["📏","Penggaris","1"],["🪵","Tusuk sate","1"]],
+ langkah:[["Potong botol menjadi bagian atas (leher) berbentuk corong.","Leher botol akan jadi pegangan yang kokoh."],["Gunting badan botol menjadi 4–6 baling-baling.","Bentuk melebar mendorong udara lebih banyak."],["Lipat tiap baling-baling sedikit miring ke arah yang sama.","Kemiringan membuat udara terdorong ke satu arah."],["Pasang pada tusuk sate, lalu putar atau tiup. Uji dan perbaiki!","Menguji dan memperbaiki adalah proses rekayasa."]],
+ stem:["Science: gerak udara dan penguapan keringat.","Technology: baling-baling sebagai alat sederhana pemindah udara.","Engineering: merancang, menguji, dan memperbaiki sudut baling-baling.","Mathematics: menghitung jumlah putaran selama 10 detik untuk tiap rancangan."],
+ sains:{baca:"Kipas berfungsi karena baling-baling mendorong udara. Dua kipas diuji: kipas A bersudut kecil, kipas B bersudut besar. Keduanya diputar dengan kekuatan sama selama 10 detik.",tbl:[["Kipas","Putaran"],["A (sudut kecil)","12"],["B (sudut besar)","20"]],
+  q:[["Mengapa wajah terasa sejuk saat dikipasi?","Udara yang bergerak membantu keringat menguap dan membawa panas",["Kipas menghasilkan es","Udara yang bergerak membantu keringat menguap dan membawa panas","Wajah menjadi kecil","Panas hilang begitu saja"]],["Agar pengujian adil, apa yang harus SAMA?","Kekuatan memutar dan lama waktu",["Warna kipas","Kekuatan memutar dan lama waktu","Nama kipas","Ukuran kertas"]],["Berdasarkan tabel, kesimpulan terbaik?","Kipas B berputar lebih banyak dalam kondisi sama",["Kipas A lebih baik","Kipas B berputar lebih banyak dalam kondisi sama","Keduanya sama","Tidak ada kesimpulan"]]]},
+ urut:["Potong botol","Gunting baling-baling","Lipat miring","Pasang pada tusuk","Uji dan perbaiki"],
+ pola:"Data: sudut kecil → 12, sedang → 16, besar → 20 putaran. Apa polanya?",polaj:"Semakin besar sudut, semakin banyak putaran",
+ refl:["Konsep sains apa yang kamu pelajari?","Bukti apa yang mendukung kesimpulanmu?","Bagaimana kamu menguji dan memperbaiki kipasmu?"]},
+{id:"air",t:"Penyaring Air Sederhana",e:"💧",
+ masalah:"Setelah hujan deras, air sungai dekat sekolah Raka menjadi keruh. Warga ingin memakai airnya untuk menyiram tanaman. Bagaimana membuat air keruh menjadi lebih jernih?",
+ pantik:"Apa yang membuat air terlihat keruh?",
+ konsep:["Air keruh mengandung partikel kecil seperti tanah dan daun halus. Penyaring bekerja dengan menahan partikel itu pada lapisan bahan berpori. Partikel besar tertahan di lapisan atas, partikel kecil tertahan di lapisan bawah.","Urutan lapisan penting. Kerikil menahan sampah besar, pasir menahan butiran halus, arang menyerap sebagian bau dan warna. Kapas atau kain di dasar menahan sisa partikel.","Air hasil saringan ini TIDAK aman diminum. Kuman tidak terlihat dan tidak tersaring. Air perlu dimasak dulu. Menjaga sungai tetap bersih lebih baik daripada membersihkan air kotor."],
+ fakta:"Air bersih adalah kebutuhan semua makhluk hidup, tetapi hanya sebagian kecil air di bumi yang mudah dipakai manusia.",
+ alat:[["🥤","Botol plastik bekas","1"],["🪨","Kerikil","1 cangkir"],["⏳","Pasir","1 cangkir"],["⚫","Arang","½ cangkir"],["🧻","Kapas/kain","1"]],
+ langkah:[["Potong dasar botol dan balikkan, tutup botol dilubangi.","Lubang kecil mengatur aliran air."],["Letakkan kapas di leher botol.","Kapas menahan butiran paling halus."],["Tuang arang, pasir, lalu kerikil berurutan.","Dari halus ke kasar agar partikel besar tertahan lebih dulu."],["Tuang air keruh perlahan, catat kejernihannya.","Mencatat data membuat hasil dapat dibandingkan."]],
+ stem:["Science: partikel, pori, dan penyaringan.","Technology: filter sebagai teknologi pembersih air.","Engineering: menyusun lapisan dan memperbaiki urutannya.","Mathematics: mengukur volume air dan membandingkan kejernihan dalam skala 1–5."],
+ sains:{baca:"Tiga penyaring diuji dengan 200 mL air keruh yang sama. Penyaring 1 hanya pasir, penyaring 2 pasir dan arang, penyaring 3 kerikil, pasir, arang, dan kapas. Kejernihan dinilai skala 1 (keruh) sampai 5 (jernih).",tbl:[["Penyaring","Kejernihan"],["1","2"],["2","3"],["3","5"]],
+  q:[["Mengapa air hasil saringan belum aman diminum?","Kuman yang tak terlihat belum tersaring",["Airnya terlalu dingin","Kuman yang tak terlihat belum tersaring","Pasirnya mahal","Airnya terlalu banyak"]],["Variabel yang diubah pada percobaan ini?","Jenis lapisan penyaring",["Jumlah air keruh","Jenis lapisan penyaring","Jenis botol","Waktu pengamatan"]],["Kesimpulan berdasarkan tabel?","Penyaring 3 paling jernih karena lapisannya paling lengkap",["Penyaring 1 terbaik","Penyaring 3 paling jernih karena lapisannya paling lengkap","Semua sama","Arang tidak berguna"]]]},
+ urut:["Potong dasar botol","Pasang kapas","Tuang arang","Tuang pasir","Tuang kerikil","Tuang air keruh"],
+ pola:"Data: 1 lapisan → skor 2, 2 lapisan → 3, 4 lapisan → 5. Apa polanya?",polaj:"Semakin banyak lapisan, semakin jernih",
+ refl:["Konsep sains apa yang kamu pelajari?","Bukti apa yang mendukung kesimpulanmu?","Bagaimana proyek ini membantu menjaga air bersih?"]},
+{id:"vac",t:"Vacuum Cleaner Mini",e:"🧹",
+ masalah:"Remah kertas hasil menggunting menumpuk di meja kelas. Menyapu membuatnya beterbangan. Bagaimana membuat alat penyedot remah tanpa listrik besar?",
+ pantik:"Bagaimana sedotan bisa menarik minuman ke mulutmu?",
+ konsep:["Saat udara di dalam alat dikeluarkan, tekanan di dalamnya lebih rendah daripada di luar. Udara luar mendorong masuk dan membawa serta benda ringan seperti remah kertas.","Pada proyek ini, penyedot dibuat dari botol dan pompa tiup atau balon. Tarikan balon mengurangi tekanan udara dalam botol. Semakin kuat tarikan, semakin kuat isapannya.","Lingkungan: membersihkan dengan alat sederhana mengurangi plastik sekali pakai seperti tisu basah dan menghemat listrik."],
+ fakta:"Udara punya berat. Kita tidak merasakannya karena tubuh kita terbiasa dengan tekanan udara.",
+ alat:[["🥤","Botol plastik bekas","1"],["🎈","Balon","1"],["🥤","Sedotan lebar","1"],["📎","Lakban","1"]],
+ langkah:[["Lubangi tutup botol untuk sedotan dan pasang rapat dengan lakban.","Kebocoran melemahkan isapan."],["Pasang balon di dasar botol yang dipotong.","Balon yang ditarik memperbesar ruang udara."],["Tarik balon, dekatkan sedotan ke remah.","Tekanan rendah menarik udara luar membawa remah."],["Uji pada remah kertas lalu perbaiki kebocoran.","Pengujian menemukan bagian yang harus diperbaiki."]],
+ stem:["Science: tekanan udara.","Technology: prinsip pompa dan penyedot.","Engineering: menutup kebocoran dan menguji ukuran sedotan.","Mathematics: menghitung jumlah remah yang terhisap dari 10 remah."],
+ sains:{baca:"Tiga sedotan berbeda diuji dengan 10 remah kertas. Setiap uji memakai tarikan balon yang sama.",tbl:[["Sedotan","Remah terhisap"],["Kecil","3"],["Sedang","6"],["Lebar","9"]],
+  q:[["Mengapa remah terhisap?","Udara luar bertekanan lebih tinggi mendorong masuk",["Remah suka botol","Udara luar bertekanan lebih tinggi mendorong masuk","Balon menyala","Remah menjadi berat"]],["Agar adil, apa yang dijaga SAMA?","Tarikan balon dan jumlah remah",["Warna sedotan","Tarikan balon dan jumlah remah","Merek lakban","Nama alat"]],["Kesimpulan dari tabel?","Sedotan lebar menghisap paling banyak",["Sedotan kecil terbaik","Sedotan lebar menghisap paling banyak","Semua sama","Tidak jelas"]]]},
+ urut:["Lubangi tutup","Pasang sedotan","Tutup rapat lakban","Pasang balon","Uji pada remah"],
+ pola:"Data: sedotan kecil → 3, sedang → 6, lebar → 9 remah. Apa polanya?",polaj:"Semakin lebar sedotan, semakin banyak remah terhisap",
+ refl:["Konsep sains apa yang kamu pelajari?","Bagaimana kamu menemukan dan memperbaiki kebocoran?","Bagaimana alat ini membantu mengurangi sampah?"]}];
+// ===== Kuis =====
+const KS={judul:"Kuis Literasi Sains",baca:"🌊 <b>Sungai Bening</b><br>Hujan deras membuat sungai dekat sekolah keruh. Siswa menyaring 200 mL air keruh dengan tiga cara dan mencatat kejernihan (1 keruh–5 jernih): pasir saja = 2, pasir+arang = 3, kerikil+pasir+arang+kapas = 5. Mereka juga tahu bahwa air hasil saringan masih mungkin mengandung kuman yang tak terlihat.",
+q:[["Mengapa air keruh setelah hujan deras?","Aliran air membawa tanah dan partikel halus ke sungai",["Air hujan berwarna cokelat","Aliran air membawa tanah dan partikel halus ke sungai","Ikan menjadi banyak","Matahari menggelapkan air"],"Menjelaskan fenomena"],
+["Mengapa kerikil diletakkan di lapisan atas?","Menahan partikel besar lebih dulu",["Agar indah","Menahan partikel besar lebih dulu","Agar air cepat dingin","Agar arang basah"],"Menjelaskan fenomena"],
+["Apa yang diubah dalam percobaan?","Susunan bahan penyaring",["Jumlah air","Susunan bahan penyaring","Tempat percobaan","Nama siswa"],"Merancang penyelidikan"],
+["Agar adil, apa yang harus sama?","Banyak dan jenis air keruh",["Banyak dan jenis air keruh","Jumlah lapisan","Jenis bahan","Hasil akhir"],"Merancang penyelidikan"],
+["Berdasarkan data, penyaring terbaik adalah...","Kerikil+pasir+arang+kapas",["Pasir saja","Pasir+arang","Kerikil+pasir+arang+kapas","Semua sama"],"Menginterpretasi data"]],
+};
+const KC={judul:"Kuis Computational Thinking",q:[
+["Membuat kipas botol dibagi menjadi: memotong, melipat, memasang, menguji. Ini adalah...","Decomposition",["Abstraction","Decomposition","Algoritma","Pola"],"Decomposition"],
+["Data: 1 lapisan → 2, 2 lapisan → 3, 3 lapisan → 4. Berapa untuk 4 lapisan?","5",["4","5","6","7"],"Pattern recognition"],
+["Untuk memilih bahan penyaring, informasi mana yang TIDAK penting?","Warna baju penguji",["Ukuran pori bahan","Warna baju penguji","Jumlah air","Jenis bahan"],"Abstraction"],
+["Urutan benar membuat penyaring air?","Potong botol → pasang kapas → arang → pasir → kerikil",["Kerikil → arang → potong botol","Potong botol → pasang kapas → arang → pasir → kerikil","Tuang air → potong botol","Pasir → kapas → potong"],"Algorithmic thinking"],
+["Sedotan kecil 3, sedang 6, lebar 9 remah. Polanya?","Bertambah 3 setiap ukuran",["Bertambah 3 setiap ukuran","Tetap","Berkurang 3","Bertambah 6"],"Pattern recognition"]]};
+// ===== Navigasi =====
+function go(v,a){const f={home,profil,aksi,kuis,proyek}[v];f(a);window.scrollTo(0,0)}
+const pct=()=>Math.round(Object.values(S.p).filter(x=>x.done).length/3*100);
+function home(){if(!S.name){S.name=(prompt("Halo! Tulis nama panggilan atau kodemu:")||"Siswa").slice(0,30);S.kelas="V";save()}
+ $("m").innerHTML=`<div class="card hero pop">🌳🧒🦋<h1>Selamat datang di STEMLECO!</h1><p style="font-size:18px">Halo ${esc(S.name)}! Mari belajar sambil menjaga bumi.</p><button class="btn" onclick="go('proyek',${P.findIndex(p=>!(S.p[p.id]||{}).done)<0?0:P.findIndex(p=>!(S.p[p.id]||{}).done)})">▶ Lanjutkan Belajar</button></div>
+ <div class="card"><b>Progres proyek: ${pct()}%</b><div class="bar"><i style="width:${pct()}%"></i></div><small>${S.log[0]?"Terakhir: "+esc(S.log[0]):"Belum ada aktivitas."}</small></div>
+ <div class="grid">${P.map((p,i)=>`<div class="card menu" onclick="go('proyek',${i})">${p.e}<h3>${p.t}</h3>${(S.p[p.id]||{}).done?"✅":""}</div>`).join("")}
+ <div class="card menu" onclick="go('kuis','s')">📖<h3>Kuis Literasi Sains</h3></div><div class="card menu" onclick="go('kuis','c')">🧩<h3>Kuis Computational Thinking</h3></div>
+ <div class="card menu" onclick="go('aksi')">🌱<h3>Aksi Lingkungan</h3></div><div class="card menu" onclick="go('profil')">🏅<h3>Profil Siswa</h3></div></div>`}
+// ===== Proyek =====
+let pi=0,st=0;const TAB=["Masalah","Materi","Alat","Langkah","STEM","Literasi Sains","Computational Thinking","Foto","Refleksi"];
+function proyek(i){if(i!==undefined){pi=i;st=0}const p=P[pi];S.p[p.id]=S.p[p.id]||{ck:{},ls:{},seq:null};const d=S.p[p.id];
+ let h="";const t=TAB[st];
+ if(t=="Masalah")h=`<h2>${p.e} ${p.t}</h2><p>${p.masalah}</p><div class="info">🤔 <b>Pertanyaan pemantik:</b> ${p.pantik}</div>`;
+ if(t=="Materi")h=`<h2>📚 Materi dan Konsep</h2>${p.konsep.map(x=>`<p>${x}</p>`).join("")}<div class="info">💡 <b>Tahukah kamu?</b> ${p.fakta}</div>`;
+ if(t=="Alat")h=`<h2>🧰 Alat dan Bahan</h2>${p.alat.map((a,i)=>`<label class="card" style="display:block;padding:10px;cursor:pointer"><input type="checkbox" ${d.ck["a"+i]?"checked":""} onchange="ck('a${i}',this.checked)"> <span style="font-size:30px">${a[0]}</span> ${a[1]} <span class="tag">${a[2]}</span></label>`).join("")}`;
+ if(t=="Langkah")h=`<h2>🔧 Langkah Pembuatan</h2>${p.langkah.map((l,i)=>`<label class="card" style="display:block;cursor:pointer"><input type="checkbox" ${d.ck["l"+i]?"checked":""} onchange="ck('l${i}',this.checked)"> <b>Langkah ${i+1}.</b> ${l[0]}<div class="info">🔬 ${l[1]}</div></label>`).join("")}`;
+ if(t=="STEM")h=`<h2>🔗 Integrasi STEM</h2>${p.stem.map((x,i)=>`<div class="card">${["🔬","💻","📐","🔢"][i]} ${x}</div>`).join("")}`;
+ if(t=="Literasi Sains"){h=`<h2>Literasi Sains</h2><p>${p.sains.baca}</p><table>${p.sains.tbl.map((r,i)=>"<tr>"+r.map(c=>i?`<td>${c}</td>`:`<th>${c}</th>`).join("")+"</tr>").join("")}</table>`+p.sains.q.map((q,qi)=>`<div class="card"><b>${qi+1}. ${q[0]}</b>${q[2].map(o=>`<button class="opt ${d.ls[qi]==o?(o==q[1]?'ok':'no'):''}" onclick="lsA(${qi},this.textContent)">${o}</button>`).join("")}${d.ls[qi]?`<div class="info">${d.ls[qi]==q[1]?"🎉 Benar!":"Belum tepat."} Jawaban: ${q[1]}</div>`:""}</div>`).join("")}
+ <div class="card"><b>Tulis penjelasanmu:</b> mengapa hasilnya begitu?<textarea id="lsO" rows="3">${esc(d.lso||"")}</textarea><button class="btn" onclick="lsS()">Simpan Jawaban</button></div>`}
+ if(t=="Computational Thinking"){d.seq=d.seq||{pick:[]};h=`<h2>🧩 Computational Thinking</h2><div class="card"><b>Algoritma:</b> klik langkah sesuai urutan benar.<div id="chips">${shuf(p.urut).map(x=>`<span class="chip ${d.seq.pick.includes(x)?'used':''}" onclick="pick(this.textContent)">${x}</span>`).join("")}</div><p>Urutanmu: ${d.seq.pick.map((x,i)=>`${i+1}. ${x}`).join(" → ")}</p><button class="btn alt" onclick="S.p[P[pi].id].seq={pick:[]};save();proyek()">Ulangi</button></div>
+ <div class="card"><b>Pattern recognition:</b> ${p.pola}${[p.polaj,"Tidak ada pola","Hasil selalu sama"].sort(()=>.5-Math.random()).map(o=>`<button class="opt" onclick="patC(this,'${o==p.polaj}')">${o}</button>`).join("")}</div>`}
+ if(t=="Foto")h=`<h2>📷 Galeri Foto</h2><div class="info">Unggah foto karya akan aktif setelah backend Google Drive dipasang. Saat ini fitur ini belum tersedia.</div>`;
+ if(t=="Refleksi")h=`<h2>📝 Refleksi</h2>${p.refl.map((q,i)=>`<p><b>${i+1}. ${q}</b><textarea rows="2" id="rf${i}">${esc((d.rf||[])[i]||"")}</textarea></p>`).join("")}<button class="btn" onclick="rfS()">Kirim Refleksi</button>`;
+ const done=Object.keys(d.ck).filter(k=>d.ck[k]).length;
+ $("m").innerHTML=`<div class="card"><div class="bar"><i style="width:${(st+1)/TAB.length*100}%"></i></div><div>${TAB.map((x,i)=>`<span class="chip ${i==st?'':'used'}" onclick="st=${i};proyek()">${x}</span>`).join("")}</div></div><div class="card">${h}</div><button class="btn alt" ${st?"":"disabled"} onclick="st--;proyek()">⬅ Sebelumnya</button><button class="btn" ${st<TAB.length-1?"":"disabled"} onclick="st++;proyek()">Berikutnya ➡</button>`}
+const shuf=a=>[...a].sort((x,y)=>(x.length*7%5)-(y.length*3%5)||x.localeCompare(y));
+function ck(k,v){S.p[P[pi].id].ck[k]=v;save()}
+function lsA(i,o){const d=S.p[P[pi].id];if(d.ls[i])return;d.ls[i]=o;save();proyek();const a=Object.keys(d.ls).length;if(a==P[pi].sains.q.length){const sk=P[pi].sains.q.filter((q,j)=>d.ls[j]==q[1]).length;kirim("Literasi Sains - "+P[pi].t,d.ls,sk+"/"+a)}}
+function lsS(){const d=S.p[P[pi].id];d.lso=$("lsO").value.slice(0,1000);save();kirim("Jawaban Terbuka - "+P[pi].t,d.lso)}
+function pick(x){const d=S.p[P[pi].id].seq,u=P[pi].urut;if(d.pick.includes(x))return;d.pick.push(x);save();proyek();if(d.pick.length==u.length){const ok=d.pick.every((y,i)=>y==u[i]);toast(ok?"🎉 Urutan benar!":"🤔 Belum tepat, coba lagi!");if(ok)kirim("CT Algoritma - "+P[pi].t,d.pick,"benar");else{S.p[P[pi].id].seq={pick:[]};save();setTimeout(proyek,1200)}}}
+function patC(b,ok){b.classList.add(ok=="true"?"ok":"no");if(ok=="true"){toast("🎉 Pola ditemukan!");kirim("CT Pola - "+P[pi].t,b.textContent,"benar")}}
+function rfS(){const p=P[pi],a=p.refl.map((q,i)=>$("rf"+i).value.slice(0,800));if(a.some(x=>x.trim().length<3)){toast("Isi semua jawaban dulu ya 😊");return}
+ const d=S.p[p.id];d.rf=a;d.done=1;S.r.unshift({p:p.t,t:new Date().toLocaleString("id-ID"),a});S.log.unshift("Refleksi "+p.t);save();kirim("Refleksi - "+p.t,a)}
+// ===== Kuis =====
+let K,kk,kn=0,ans=[],fin=0;
+function kuis(w){K=w=="s"?KS:KC;kk=w;kn=0;ans=[];fin=0;kv()}
+function kv(){const q=K.q[kn];if(fin)return hasil();
+ $("m").innerHTML=`<div class="card"><h2>${K.judul}</h2><div class="bar"><i style="width:${(kn+1)/K.q.length*100}%"></i></div>Soal ${kn+1} dari ${K.q.length}</div>${K.baca?`<div class="card" style="background:var(--soft)">${K.baca}</div>`:""}
+ <div class="card"><b>${q[0]}</b>${q[2].map((o,i)=>`<button class="opt ${ans[kn]===i?'sel':''}" onclick="ans[kn]=${i};kv()">${"ABCD"[i]}. ${o}</button>`).join("")}</div>
+ <button class="btn alt" ${kn?"":"disabled"} onclick="kn--;kv()">⬅</button><button class="btn" ${kn<K.q.length-1?"":"disabled"} onclick="kn++;kv()">➡</button><button class="btn" onclick="kSend()">Kirim Jawaban</button>`}
+async function kSend(){const un=K.q.map((q,i)=>ans[i]===undefined?i+1:0).filter(x=>x);if(un.length){toast("Belum dijawab: soal "+un.join(", "));return}
+ const sk=K.q.filter((q,i)=>K.q[i][2][ans[i]]==q[1]).length,sc=Math.round(sk/K.q.length*100);
+ S.q.unshift({k:K.judul,t:new Date().toLocaleString("id-ID"),sk,n:K.q.length,sc,det:K.q.map((q,i)=>[q[3],K.q[i][2][ans[i]]==q[1]])});S.log.unshift(K.judul+" skor "+sc);save();fin=1;await kirim(K.judul,ans.map(a=>"ABCD"[a]),sc);hasil()}
+function hasil(){const r=S.q[0];$("m").innerHTML=`<div class="card hero pop">${r.sc>=70?"🏆":"🌱"}<h1>Skor: ${r.sc}</h1><p style="font-size:18px">${r.sk} dari ${r.n} benar</p></div><h2>Pembahasan</h2>${K.q.map((q,i)=>`<div class="card"><b>${i+1}. ${q[0]}</b><div class="info">${K.q[i][2][ans[i]]==q[1]?"✅":"❌"} Jawabanmu: ${K.q[i][2][ans[i]]}<br>Jawaban benar: ${q[1]}<br><span class="tag">${q[3]}</span></div></div>`).join("")}<button class="btn" onclick="go('home')">Beranda</button>`}
+// ===== Aksi & Profil =====
+function aksi(){const L=["💧 Menghemat air","♻️ Mengurangi plastik sekali pakai","🔁 Menggunakan kembali bahan","🌱 Merawat tanaman","🧹 Menjaga kebersihan","🤝 Bekerja sama dengan teman"];
+ $("m").innerHTML=`<div class="card"><h2>🌱 Aksi Lingkungan</h2><select id="ac" style="font:inherit;padding:8px;border-radius:12px;width:100%">${L.map(x=>`<option>${x}</option>`).join("")}</select><p>Rencanamu:<textarea id="ar" rows="2"></textarea></p><button class="btn alt" onclick="aS('Rencana')">Simpan sebagai RENCANA</button></div>
+ <h3>Catatanmu</h3>${S.a.map((x,i)=>`<div class="card"><span class="tag">${x.s}</span> ${x.c}<br>${esc(x.r)}${x.s=="Rencana"?`<p>Setelah dilakukan, tulis dampaknya:<input type="text" id="im${i}"><button class="btn" onclick="aD(${i})">Sudah Kulakukan</button></p>`:`<div class="info">Dampak: ${esc(x.im)}</div>`}</div>`).join("")||"<p>Belum ada catatan.</p>"}`}
+function aS(s){const r=$("ar").value.trim();if(!r){toast("Tulis rencanamu dulu");return}S.a.unshift({s,c:$("ac").value,r:r.slice(0,500)});S.log.unshift("Aksi: "+$("ac").value);save();kirim("Aksi Lingkungan - Rencana",S.a[0]);aksi()}
+function aD(i){const m=$("im"+i).value.trim();if(!m){toast("Tulis dampaknya dulu");return}S.a[i].s="Sudah dilakukan";S.a[i].im=m.slice(0,500);save();kirim("Aksi Lingkungan - Dilakukan",S.a[i]);aksi()}
+function profil(){const c={};S.q.forEach(r=>r.det.forEach(([k,ok])=>{c[k]=c[k]||[0,0];c[k][1]++;if(ok)c[k][0]++}));
+ $("m").innerHTML=`<div class="card"><h2>🧒 ${esc(S.name||"Siswa")}</h2><button class="btn alt" onclick="S.name=prompt('Nama baru?')||S.name;save();profil()">Ganti nama</button><p>Progres proyek: ${pct()}%</p><div class="bar"><i style="width:${pct()}%"></i></div></div>
+ <div class="card"><h3>Kompetensi (dari kuis tersimpan)</h3>${Object.entries(c).map(([k,v])=>`<p>${k}: ${v[0]}/${v[1]}<div class="bar"><i style="width:${v[0]/v[1]*100}%"></i></div></p>`).join("")||"Belum ada data kuis."}</div>
+ <div class="card"><h3>Riwayat kuis</h3>${S.q.map(r=>`<p>${r.k}: <b>${r.sc}</b> (${r.t})</p>`).join("")||"Belum ada."}</div>
+ <div class="card"><h3>Jurnal refleksi</h3>${S.r.map(r=>`<p><b>${r.p}</b><br>${r.a.map(esc).join("<br>")}</p>`).join("")||"Belum ada."}</div><div class="card"><h3>Aksi</h3>${S.a.map(x=>`<p>${x.s}: ${x.c}</p>`).join("")||"Belum ada."}</div>`}
+home();
+</script></body></html>
